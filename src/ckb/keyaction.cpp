@@ -419,6 +419,7 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         } else {
             process = new QProcess(this);
             process->start("sh", QStringList() << "-c" << program);
+            connect(process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(procFinished(int, QProcess::ExitStatus)));
             if(down)
                 preProgram = process;
             else
@@ -428,6 +429,18 @@ void KeyAction::keyEvent(KbBind* bind, bool down){
         // Do nothing, because all work is done by the keyboard itself.
         // For now, there is no reason to react on G-key press or release.
         // If u find some reason, then here is the place for it.
+    }
+}
+
+void KeyAction::procFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if ((exitStatus == QProcess::NormalExit) && (exitCode >= 100) && (exitCode < 200))
+    {
+        emit userLightRequest(exitCode - 100);
+    }
+    else
+    {
+        emit userLightRequest(0);
     }
 }
 

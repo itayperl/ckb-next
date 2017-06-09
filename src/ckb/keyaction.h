@@ -159,6 +159,13 @@ public:
 
 
     ~KeyAction();
+
+public slots:
+    void procFinished(int exitCode, QProcess::ExitStatus exitStatus);
+
+signals:
+    void userLightRequest(int code);
+
 private:
     /// ccMSC: Don't copy key actions (the old one needs to be deleted first)
     /// frickler24: statement left as described, but copying is done in KbBind copy constructor

@@ -430,7 +430,6 @@ void KbPerf::lightIndicator(const char* name, QRgb rgba){
 }
 
 void KbPerf::applyIndicators(int modeIndex, const bool indicatorState[]){
-    light()->resetIndicators();
     if(_iOpacity <= 0.f)
         return;
     if(_dpiIndicator){

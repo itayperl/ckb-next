@@ -32,6 +32,7 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const 
         KeyAction* act = _bind.value(key);
         if(act) {
             newBind[key] = new KeyAction(act->value(), this);
+            connect(_bind[key], &KeyAction::userLightRequest, [=](int code) { userLightReq(key, code); });
         }
     }
 
@@ -42,6 +43,7 @@ KbBind::KbBind(KbMode* modeParent, Kb* parentBoard, const KeyMap& keyMap, const 
         if(act) {
             /// and move the KeyActions we just created
             _bind[key] = new KeyAction(act->value(), this);
+            connect(_bind[key], &KeyAction::userLightRequest, [=](int code) { userLightReq(key, code); });
         }
     }
     newBind.clear();      // here we *must not* delete the KeyActions, because they are referenced by _bind now
@@ -71,6 +73,7 @@ void KbBind::load(CkbSettings& settings){
                 name = _map.fromStorage(name);
             QString bind = settings.value(key).toString();
             _bind[name] = new KeyAction(bind, this);
+            connect(_bind[name], &KeyAction::userLightRequest, [=](int code) { userLightReq(name, code); });
         }
     }
     _winLock = settings.value("WinLock").toBool();
@@ -183,6 +186,7 @@ void KbBind::setAction(const QString& key, const QString& action){
     if(!_map.key(rKey))
         return;
     _bind[rKey] = new KeyAction(action, this);
+    connect(_bind[rKey], &KeyAction::userLightRequest, [=](int code) { userLightReq(rKey, code); });
 }
 
 void KbBind::update(QFile& cmd, bool force){
@@ -289,4 +293,22 @@ void KbBind::keyEvent(const QString& key, bool down){
     KeyAction* act = bindAction(rKey);
     if(act)
         act->keyEvent(this, down);
+}
+
+void KbBind::userLightReq(const QString& key, int code)
+{
+    QRgb color = 0;
+
+    if (code > 0)
+    {
+        bool red   = code & 1;
+        bool green = code & 2;
+        bool blue  = code & 4;
+
+        color = qRgb(red*255,
+                     green*255,
+                     blue*255);
+    }
+
+    light()->setIndicator(key.toLatin1().data(), color);
 }

@@ -104,6 +104,9 @@ public slots:
     // Callback for a keypress event.
     void keyEvent(const QString& key, bool down);
 
+    // Callback for light request from user script
+    void userLightReq(const QString& key, int code);
+
 signals:
     void didLoad();
     void layoutChanged();
